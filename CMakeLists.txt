@@ -42,7 +42,7 @@ pico_enable_stdio_uart(yapc_poc 0)
 pico_enable_stdio_usb(yapc_poc 1)
 
 # Add any PICO_CONFIG entries specified in the Advanced settings
-add_compile_definitions(PICO_MALLOC_PANIC = 0)
+add_compile_definitions(PICO_MALLOC_PANIC=0)
 
 # Add the standard library to the build
 target_link_libraries(yapc_poc
