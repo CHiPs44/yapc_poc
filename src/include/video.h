@@ -8,40 +8,72 @@ extern "C"
 {
 #endif
 
+typedef struct _rgb5515
+{
+    unsigned int r:5;
+    unsigned int g:5;
+    unsigned int a:1;
+    unsigned int b:5;
+} rgb5515_t;
+
+typedef struct _video_info
+{
+    uint16_t    width;
+    uint16_t    height;
+    uint8_t     depth;
+    rgb5515_t   palette[256];
+} video_info_t;
+
 // typedef struct
 // {
 // } tile_t;
 
-typedef struct {
-    uint8_t width;    // <=8
-    uint8_t height;   // <=8
-    uint8_t encoding; // cp437, cp850, atari, amstrad_en, petscii, ...
-    uint8_t reserved; // paddind to 32 bits
-} font_info_t;
-
-typedef struct
+typedef enum _font_encoding
 {
-    int16_t  x;
-    int16_t  y;
-    uint8_t  alpha:     4; // transparent color index
-    bool     size:      2; // 0=8x8 1=16x8 2=8x16 3=16x16
-    bool     flip_h:    1;
-    bool     flip_v:    1;
-    uint8_t  rotate:    2; // 0=0° 1=90° 2=180° 3=270°
-    uint32_t reserved: 22; // of 32 bits
-} sprite_info_t;
+    ENCODING_ASCII = 0,
+    ENCODING_CP437,
+    ENCODING_CP850,
+    ENCODING_ATARI,
+    ENCODING_PETSCII,
+} font_encoding_t;
 
-typedef struct {
+typedef struct _font_info
+{                       // bytes
+    uint8_t  width;     // 1: limit to 16?
+    uint8_t  height;    // 1: limit to 16?
+    uint8_t  underline; // 1: <= height
+    uint8_t  encoding;  // 1: ascii, cp437, cp850, atari, petscii...
+    uint8_t *bitmap;    // 4: pointer to bitmap
+} font_info_t;          // 8 bytes total
+
+typedef struct _sprite_info
+{
+    int16_t  x;            //  2: can be negative if (even partially) offscreen
+    int16_t  y;            //  2: can be negative if (even partially) offscreen
+    uint8_t  alpha:     8; // transparent color index
+    uint8_t  depth:     2; // 0=1bpp/monochrome, 1=2bpp/4 colors, 2=4bpp/16 colors, 3=8bpp/256 colors
+    uint8_t  palette:   4; // palette number 0 to 15
+    uint8_t  width:     1; // 0=8, 1=16
+    uint8_t  height:    1; // 0=8, 1=16
+    bool     h_flip:    1; // flip horizontally?
+    bool     v_flip:    1; // flip vertically?
+    uint8_t  rotate:    2; // 0=0° 1=90° 2=180° 3=270°
+    bool     visible:   1; // false=hidden, true=visible
+    uint32_t reserved: 11; //  4: of 32 bits
+} sprite_info_t;           // 8 bytes total
+
+typedef struct _tilemap_info
+{
     uint16_t width;
     uint16_t height;
-    int16_t  window_x; // left of tilemap window / 8
-    int16_t  window_y; // top of tilemap window / 8
-    int16_t  window_w; // width of tilemap window / 8
-    int16_t  window_h; // height of tilemap window / 8
-    int8_t   offset_x; // offset to left of tilemap, 0 to 
-    int8_t   offset_y; // offset to left of tilemap
-    int8_t   scroll_x; // -7 to +7
-    int8_t   scroll_y; // -7 to +7
+    uint16_t  window_x; // left of tilemap window / 8
+    uint16_t  window_y; // top of tilemap window / 8
+    uint16_t  window_w; // width of tilemap window / 8
+    uint16_t  window_h; // height of tilemap window / 8
+    int8_t   offset_x; // offset to left of tilemap, 0 to width - window_w
+    int8_t   offset_y; // offset to top of tilemap, 0 to height - window_h
+    int8_t   scroll_x; // -7 to +7 pixels
+    int8_t   scroll_y; // -7 to +7 pixels
 } tilemap_info_t;
 
 typedef struct
@@ -52,20 +84,19 @@ typedef struct
     uint8_t font:       1; // 0=font #1 1=font #2
     uint8_t reverse:    1; // swap bg & fg
     uint8_t alpha:      1; // ignore bg
-    uint8_t scale_x:    4; // 0 is processed as 1
+    uint8_t scale_x:    4; // 0 is processed as 1, up to 15 (16)
     uint8_t scale_y:    4; // (scale + 1 is used)
     uint8_t reserved:   5; // of 32 bits
 } text_char_t;
 
 typedef struct
 {
-    uint8_t tile_bitmap[256][8*8/2];    // 8192
-    uint8_t font_bitmap[2][256][8];     // 4096
-    sprite_info_t sprite[256];
-    font_info_t font_info[2];
-
+    uint8_t         tile_bitmap[256][8*8/2];    // 8192
+    uint8_t         font_bitmap[2][256][8];     // 4096
+    sprite_info_t   sprite[256];
+    font_info_t     font_info[2];
+    tilemap_info_t tilemap_info;
 } video_t;
-
 
 #ifdef __cplusplus
 }
