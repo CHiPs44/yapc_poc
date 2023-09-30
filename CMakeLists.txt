@@ -41,6 +41,12 @@ pico_set_program_version(yapc_poc "0.1")
 pico_enable_stdio_uart(yapc_poc 0)
 pico_enable_stdio_usb(yapc_poc 1)
 
+# add_subdirectory (external/pico-filesystem pfs)
+add_subdirectory (../pico-filesystem pfs)
+target_link_libraries(yapc_poc flash_filesystem)
+target_link_libraries(yapc_poc sdcard_filesystem)
+target_link_libraries(device_filesystem)
+
 # Add any PICO_CONFIG entries specified in the Advanced settings
 add_compile_definitions(PICO_MALLOC_PANIC=0)
 
@@ -70,8 +76,6 @@ target_include_directories(yapc_poc PRIVATE
 pico_add_extra_outputs(yapc_poc)
 
 target_compile_definitions(yapc_poc PUBLIC 
-  CMAKE_BUILD_TYPE=Debug
-  # CMAKE_BUILD_TYPE=Release
 )
 
 # EOF
