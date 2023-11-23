@@ -41,6 +41,7 @@ pico_set_program_version(yapc_poc "0.1")
 pico_enable_stdio_uart(yapc_poc 0)
 pico_enable_stdio_usb(yapc_poc 1)
 
+# Use pico-filesystem as a local repository for now
 # add_subdirectory (external/pico-filesystem pfs)
 add_subdirectory (../pico-filesystem pfs)
 target_link_libraries(yapc_poc flash_filesystem)
@@ -57,8 +58,8 @@ target_link_libraries(yapc_poc
 
 # Add the standard include files to the build
 target_include_directories(yapc_poc PRIVATE
-  ${CMAKE_CURRENT_LIST_DIR}
-  ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
+  ${CMAKE_CURRENT_LIST_DIR}/include
+  # ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
 )
 
 # # Add any user requested libraries
